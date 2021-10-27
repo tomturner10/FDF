@@ -12,7 +12,7 @@ void ft_putpixel(t_data *data, int x, int y, int colour)
 {
 	char *dst;
 
-	dst = data->addr + (y + data->line_length + x * (data->bits_per_pixel / 8 ));
+	dst = data->addr + (y * data->line_length + (x * (data->bits_per_pixel / 8 )));
 	*(unsigned int*)dst = colour;
 }
 
@@ -28,7 +28,7 @@ int	main(void)
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
 	for (int i  = 10; i < 100; i++)
 	{
-		ft_putpixel(&img, 5, 5, 0x00FF0000);
+		ft_putpixel(&img, 5, i, 0x00FF0000);
 	}
 	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
 	mlx_loop(mlx);
