@@ -8,6 +8,21 @@ typedef struct	s_data {
 	int		endian;
 }				t_data;
 
+typedef struct	s_vec3d 
+{
+	float x, y, z;
+}				t_vec3d;
+
+typedef struct	s_triangle
+{
+	t_vec3d p[3];
+}				t_triangle;
+
+typedef struct	s_mat4x4
+{
+	float m[4][4];
+}				t_mat4x4;
+
 void ft_putpixel(t_data *data, int x, int y, int colour)
 {
 	char *dst;
