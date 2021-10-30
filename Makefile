@@ -1,7 +1,7 @@
 
 NAME = fdf
 
-SRCS = test.c
+SRCS = main.c
 
 FLAGS = -Werror -Wextra -Wall
 
