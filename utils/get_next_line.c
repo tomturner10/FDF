@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "utils.h"
 
 static char	*ft_append(char *line, char *buf)
 {
@@ -78,21 +78,21 @@ static char	*ft_overwrite(char *line)
 	return (rtn);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, int buffsize)
 {
 	static char	*line;
 	char		*buf;
 	int			r;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || buffsize < 1)
 		return (NULL);
-	buf = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	buf = (char *)malloc((buffsize + 1) * sizeof(char));
 	if (buf == NULL)
 		return (NULL);
 	r = 1;
 	while (ft_strchr(line, '\n') == 0 && r != 0)
 	{
-		r = read(fd, buf, BUFFER_SIZE);
+		r = read(fd, buf, buffsize);
 		if (r < 0)
 			break ;
 		buf[r] = '\0';

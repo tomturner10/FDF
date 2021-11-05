@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "utils.h"
 
 static unsigned int	ft_strlcpy(char *dest, char *src, unsigned int size)
 {

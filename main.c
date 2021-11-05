@@ -1,5 +1,8 @@
 #include "mlx/mlx.h"
+#include "utils/utils.h"
+#include "lst/lst.h"
 #include <math.h>
+#include <fcntl.h>
 
 typedef struct	s_data {
 	void	*img;
@@ -51,33 +54,70 @@ void ft_MultiplyMatrixVector(t_vec3d i, t_vec3d o, t_mat4x4 m)
 	}
 }
 
+typedef struct betterlist{
+	char **line;
+	struct betterlist *next;
+} b_list;
+
+b_list	*ft_parsefdf(char *file)
+{
+	int	fd;
+	b_list *list = NULL;
+	b_list *curr = NULL;
+	b_list *new = NULL;
+	char *line;
+
+	fd = open(file, O_RDONLY);
+	while(1){
+		line = get_next_line(fd,100);
+		if (!line) break;
+		new = malloc(sizeof(b_list));
+		new->next=NULL;
+		new->line = ft_split(line,' ');
+		if (!list) list = new;
+		else {
+			curr = list;
+			while (curr->next)
+				curr = curr->next;
+			curr->next = new;
+		}
+	}
+	return (list);
+}
+
 int	main(void)
 {
-	t_mat4x4 matProj;
-	float fWidth = 1920;
-	float fHeight = 1080;
-	float fNear = 0.1;
-	float fFar = 1000;
-	float fFov = 90;
-	float fAspectRatio = fHeight / fWidth;
-	float fFovRad = 1 / tan(fFov * .5 / 180 * 3.14159);
-	matProj.m[0][0] = fAspectRatio * fFovRad;
-	matProj.m[1][1] = fFovRad;
-	matProj.m[2][2] = fFar / (fFar - fNear);
-	matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
-	matProj.m[2][3] = 1.0;
-	matProj.m[3][3] = 0.0;
+	// t_mat4x4 matProj;
+	// float fWidth = 1920;
+	// float fHeight = 1080;
+	// float fNear = 0.1;
+	// float fFar = 1000;
+	// float fFov = 90;
+	// float fAspectRatio = fHeight / fWidth;
+	// float fFovRad = 1 / tan(fFov * .5 / 180 * 3.14159);
+	// matProj.m[0][0] = fAspectRatio * fFovRad;
+	// matProj.m[1][1] = fFovRad;
+	// matProj.m[2][2] = fFar / (fFar - fNear);
+	// matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+	// matProj.m[2][3] = 1.0;
+	// matProj.m[3][3] = 0.0;
 
-	void	*mlx;
-	void	*mlx_win;
-	t_data	img;
+	// void	*mlx;
+	// void	*mlx_win;
+	// t_data	img;
 
-	mlx = mlx_init();
-	mlx_win = mlx_new_window(mlx, 1920, 1080, "test");
-	img.img = mlx_new_image(mlx, 1920, 1080);
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	for (int i  = 10; i < 100; i++)
-		ft_putpixel(&img, 5, i, 0x000000FF);
-	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-	mlx_loop(mlx);
+	// mlx = mlx_init();
+	// mlx_win = mlx_new_window(mlx, 1920, 1080, "test");
+	// img.img = mlx_new_image(mlx, 1920, 1080);
+	// img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+	// for (int i  = 10; i < 100; i++)
+	// 	ft_putpixel(&img, 5, i, 0x000000FF);
+	// mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+	// mlx_loop(mlx);
+	b_list *list;
+	char *test;
+
+	list = ft_parsefdf("test_maps/10-2.fdf");
+	test = list->line[2];
+	printf("%s", test);
 }

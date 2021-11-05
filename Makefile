@@ -1,14 +1,17 @@
 
 NAME = fdf
 
-SRCS = main.c
+SRCS = main.c \
+		utils/ft_split.c \
+		utils/get_next_line_utils.c \
+		utils/get_next_line.c
 
 FLAGS = -Werror -Wextra -Wall
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -Lmlx -lmlx -framework OpenGL -framework AppKit $(SRCS) -o $(NAME)
+	$(CC) -Lmlx -lmlx -Imlx -Ilst -Iutils -framework OpenGL -framework AppKit $(SRCS) -o $(NAME)
 	
 clean:
 	rm -f $(NAME)
