@@ -86,6 +86,6 @@ char	**ft_split(char const *s, char c)
 		rtn[i][j] = '\0';
 		i++;
 	}
-	rtn[i - 1] = NULL;
+	rtn[i] = NULL;
 	return (rtn);
 }

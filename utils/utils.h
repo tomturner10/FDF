@@ -23,5 +23,6 @@ int		ft_strchr(char *str, int c);
 char	*ft_strdup(char *str);
 int		ft_strlen(char *s);
 char	**ft_split(char const *s, char c);
+int     ft_atoi(const char *nptr);
 
 #endif

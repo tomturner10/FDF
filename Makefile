@@ -4,7 +4,8 @@ NAME = fdf
 SRCS = main.c \
 		utils/ft_split.c \
 		utils/get_next_line_utils.c \
-		utils/get_next_line.c
+		utils/get_next_line.c \
+		utils/ft_atoi.c
 
 FLAGS = -Werror -Wextra -Wall
 

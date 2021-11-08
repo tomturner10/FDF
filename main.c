@@ -13,8 +13,8 @@ typedef struct	s_data {
 
 typedef struct	s_vec3d 
 {
-	float x, y;
-	char *z;
+	float x, y; 
+	int z;
 	int colour;
 }				t_vec3d;
 
@@ -109,6 +109,18 @@ int ft_getx(t_list *list)
 	return (count);
 }
 
+void ft_getz(t_vec3d *vec,char *z)
+{
+	char **split;
+
+	split = ft_split(z, ',');
+	vec->z = ft_atoi(split[0]);
+	if (split[1])
+		vec->colour = atoi(split[1]);
+	else
+		vec->colour = 0;
+}
+
 t_vec3d **ft_map(t_list *list)
 {
 	t_vec3d **map;
@@ -126,7 +138,7 @@ t_vec3d **ft_map(t_list *list)
 			map[(i * y) + j] = (t_vec3d *)malloc(sizeof(t_vec3d *));
 			map[(i * y) + j]->y = i + 1;
 			map[(i * y) + j]->x = j + 1;
-			map[(i * y) + j]->z = list->line[j];
+			ft_getz(map[(i * y) + j], list->line[j]);
 			j++;
 		}
 		list = list->next;
@@ -170,5 +182,5 @@ int	main(void)
 	list = ft_parsefdf("test_maps/20-60.fdf");
 	map = ft_map(list);
 	for (int i = 0; i < 400; i++)
-		printf("%s, %f, %f \n", map[i]->z, map[i]->x, map[i]->y);
+		printf("%i, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
 }
