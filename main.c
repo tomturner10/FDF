@@ -1,6 +1,5 @@
 #include "mlx/mlx.h"
 #include "utils/utils.h"
-#include "lst/lst.h"
 #include <math.h>
 #include <fcntl.h>
 
@@ -54,24 +53,24 @@ void ft_MultiplyMatrixVector(t_vec3d i, t_vec3d o, t_mat4x4 m)
 	}
 }
 
-typedef struct betterlist{
+typedef struct s_list{
 	char **line;
 	struct betterlist *next;
-} b_list;
+} t_list;
 
-b_list	*ft_parsefdf(char *file)
+t_list	*ft_parsefdf(char *file)
 {
 	int	fd;
-	b_list *list = NULL;
-	b_list *curr = NULL;
-	b_list *new = NULL;
+	t_list *list = NULL;
+	t_list *curr = NULL;
+	t_list *new = NULL;
 	char *line;
 
 	fd = open(file, O_RDONLY);
 	while(1){
 		line = get_next_line(fd,100);
 		if (!line) break;
-		new = malloc(sizeof(b_list));
+		new = malloc(sizeof(t_list));
 		new->next=NULL;
 		new->line = ft_split(line,' ');
 		if (!list) list = new;
@@ -83,6 +82,22 @@ b_list	*ft_parsefdf(char *file)
 		}
 	}
 	return (list);
+}
+
+int ft_gety(t_list *list)
+{
+	int count;
+	t_list *curr;
+
+	count  = 0;
+	if (!list) return (0);
+	curr = list;
+	while (curr->next)
+	{
+		count++;
+		curr = curr->next;
+	}
+	return (count);
 }
 
 int	main(void)
@@ -114,10 +129,8 @@ int	main(void)
 	// 	ft_putpixel(&img, 5, i, 0x000000FF);
 	// mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
 	// mlx_loop(mlx);
-	b_list *list;
-	char *test;
+	t_list *list;
 
 	list = ft_parsefdf("test_maps/10-2.fdf");
-	test = list->line[2];
-	printf("%s", test);
+	printf("%i", ft_gety(list));
 }
