@@ -70,7 +70,7 @@ char	**ft_split(char const *s, char c)
 
 	i = 0;
 	k = 0;
-	rtn = (char **)malloc((ft_countwords(s, c) + 1) * sizeof(char *));
+	rtn = (char **)malloc(ft_countwords(s, c) * sizeof(char *));
 	if (s == NULL || rtn == NULL)
 		return (NULL);
 	while (i < ft_countwords(s, c))
@@ -86,6 +86,6 @@ char	**ft_split(char const *s, char c)
 		rtn[i][j] = '\0';
 		i++;
 	}
-	rtn[i] = NULL;
+	rtn[i - 1] = NULL;
 	return (rtn);
 }
