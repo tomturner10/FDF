@@ -25,7 +25,7 @@ typedef struct s_img {
 typedef struct	s_vec3d 
 {
 	float x, y; 
-	int z;
+	float z;
 	int colour;
 }				t_vec3d;
 
@@ -42,19 +42,19 @@ void ft_putpixel(t_img *data, int x, int y, int colour)
 	*(unsigned int*)dst = colour;
 }
 
-void ft_MultiplyMatrixVector(t_vec3d i, t_vec3d o, t_mat4x4 m)
+void ft_MultiplyMatrixVector(t_vec3d *i, t_vec3d *o, t_mat4x4 *m)
 {
-	o.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + m.m[3][0];
-	o.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + m.m[3][1];
-	o.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + m.m[3][2];
-	o.colour = i.colour;
-	float w = i.x * m.m[0][3] + i.y * m.m[1][3] + i.z * m.m[2][3] + m.m[3][3];
+	o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
+	o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
+	o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
+	o->colour = i->colour;
+	float w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
 
 	if (w != 0.0f)
 	{
-		o.x /= w;
-		o.y /= w;
-		o.z /= w;
+		o->x /= w;
+		o->y /= w;
+		o->z /= w;
 	}
 }
 
@@ -162,6 +162,7 @@ t_data	*initdata()
 {
 	t_data *data;
 
+	data = (t_data *)malloc(sizeof(t_data));
 	data->fWidth = 1920;
 	data->fHeight = 1080;
 	data->fNear = 0.1;
@@ -169,27 +170,26 @@ t_data	*initdata()
 	data->fFov = 90;
 	data->fAspectRatio = data->fHeight / data->fWidth;
 	data->fFovRad = 1 / tan(data->fFov * .5 / 180 * 3.14159);
+	return (data);
 }
 
-t_mat4x4	*ft_initmat(t_data *data)
+t_mat4x4	*ft_initmat()
 {
 	t_mat4x4 *matProj;
+	t_data *data = initdata();
 
+	matProj = (t_mat4x4 *)malloc(sizeof(t_mat4x4));
 	matProj->m[0][0] = data->fAspectRatio * data->fFovRad;
 	matProj->m[1][1] = data->fFovRad;
 	matProj->m[2][2] = data->fFar / (data->fFar - data->fNear);
 	matProj->m[3][2] = (-data->fFar * data->fNear) / (data->fFar - data->fNear);
 	matProj->m[2][3] = 1.0;
 	matProj->m[3][3] = 0.0;
-	return matProj;
+	return (matProj);
 }
 
 int	main(void)
 {
-	
-
-
-
 	void	*mlx;
 	void	*mlx_win;
 	t_img	img;
@@ -198,15 +198,21 @@ int	main(void)
 	mlx_win = mlx_new_window(mlx, 1920, 1080, "test");
 	img.img = mlx_new_image(mlx, 1920, 1080);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	for (int i  = 10; i < 100; i++)
-		ft_putpixel(&img, 5, i, 0x000000FF);
-	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-	mlx_loop(mlx);
 	t_list *list;
 	t_vec3d **map;
-
+	t_mat4x4 *mat;
 	list = ft_parsefdf("test_maps/20-60.fdf");
 	map = ft_map(list);
+	mat = ft_initmat();
+	t_vec3d *vec;
+	vec = (t_vec3d *)malloc(sizeof(t_vec3d));
 	for (int i = 0; i < 400; i++)
-		printf("%i, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
+	{
+		printf("%f, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
+		ft_MultiplyMatrixVector(map[i], vec, mat);
+		printf("%f, %f, %f, %i \n", vec->z, vec->x, vec->y, vec->colour);
+	}
+	//mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+	//mlx_loop(mlx);
+	return (0);
 }
