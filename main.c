@@ -214,7 +214,8 @@ int	main(void)
 		map[i]->y += 1.0;
 		map[i]->y *= 0.5 * 1080.0;
 		printf("%f, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
-		ft_putpixel(&img, map[i]->x, map[i]->y, 0x00FF0000);
+		if(map[i]->x > 0 && map[i]->x < 1920 && map[i]->y > 0 && map[i]->y < 1080)
+			ft_putpixel(&img, map[i]->x, map[i]->y, 0x00FF0000);
 		free(vec);
 	}
 	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
