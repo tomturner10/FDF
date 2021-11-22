@@ -36,9 +36,11 @@ typedef struct	s_mat4x4
 void ft_putpixel(t_img *data, int x, int y, int colour)
 {
 	char *dst;
-
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8 ));
-	*(unsigned int*)dst = colour;
+	if(x > 0 && x < 1920 && y > 0 && y < 1080)
+	{
+		dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8 ));
+		*(unsigned int*)dst = colour;
+	}
 }
 
 void ft_MultiplyMatrixVector(t_vec3d *i, t_vec3d *o, t_mat4x4 *m)
@@ -187,6 +189,30 @@ t_mat4x4	*ft_initmat()
 	return (matProj);
 }
 
+void ft_drawline(t_img data, int x0, int y0, int x1, int y1)  
+{  
+    int dx, dy, p, x, y;  
+    dx=x1-x0;  
+    dy=y1-y0;  
+    x=x0;  
+    y=y0;  
+    p=2*dy-dx;  
+    while(x<x1)  
+    {  
+        if(p>=0)  
+        {  
+            ft_putpixel(&data,x,y,0x00FF0000);  
+            y=y+1;  
+            p=p+2*dy-2*dx;  
+        }  
+        else  
+        {  
+            ft_putpixel(&data,x,y,0x00FF0000);  
+            p=p+2*dy;}  
+            x=x+1;  
+        }  
+} 
+
 int	main(void)
 {
 	void	*mlx;
@@ -214,10 +240,10 @@ int	main(void)
 		map[i]->y += 1.0;
 		map[i]->y *= 0.5 * 1080.0;
 		printf("%f, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
-		if(map[i]->x > 0 && map[i]->x < 1920 && map[i]->y > 0 && map[i]->y < 1080)
-			ft_putpixel(&img, map[i]->x, map[i]->y, 0x00FF0000);
+		ft_putpixel(&img, map[i]->x, map[i]->y, 0x00FF0000);
 		free(vec);
 	}
+	ft_drawline(img, 100, 100, 200, 200);
 	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
 	mlx_loop(mlx);
 	return (0);
