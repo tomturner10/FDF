@@ -7,12 +7,12 @@ SRCS = main.c \
 		utils/get_next_line.c \
 		utils/ft_atoi.c
 
-FLAGS = -Werror -Wextra -Wall
+FLAGS = -Werror -Wextra -Wall -g
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -Lmlx -lmlx -Imlx -Ilst -Iutils -framework OpenGL -framework AppKit $(SRCS) -o $(NAME)
+	$(CC) -g -Lmlx -lmlx -Imlx -Ilst -Iutils -framework OpenGL -framework AppKit $(SRCS) -o $(NAME)
 	
 clean:
 	rm -f $(NAME)

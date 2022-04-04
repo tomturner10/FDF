@@ -3,17 +3,6 @@
 #include <math.h>
 #include <fcntl.h>
 
-
-typedef struct	s_data {
-	double fWidth;
-	double fHeight;
-	double fNear;
-	double fFar;
-	double fFov;
-	double fAspectRatio;
-	double fFovRad;
-}				t_data;
-
 typedef struct s_img {
 	void	*img;
 	char	*addr;
@@ -22,40 +11,22 @@ typedef struct s_img {
 	int		endian;
 }				t_img;
 
-typedef struct	s_vec3d 
+typedef struct	s_vec3d
 {
 	double x, y, z;
 	int colour;
 }				t_vec3d;
 
-typedef struct	s_mat4x4
-{
-	double m[4][4];
-}				t_mat4x4;
+int win_width = 1920;
+int win_height = 1080;
 
 void ft_putpixel(t_img *data, int x, int y, int colour)
 {
 	char *dst;
-	if(x > 0 && x < 1920 && y > 0 && y < 1080)
+	if(x > 0 && x < win_width && y > 0 && y < win_height)
 	{
 		dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8 ));
 		*(unsigned int*)dst = colour;
-	}
-}
-
-void ft_MultiplyMatrixVector(t_vec3d *i, t_vec3d *o, t_mat4x4 *m)
-{
-	o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
-	o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
-	o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
-	o->colour = i->colour;
-	double w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
-
-	if (w != 0.0f)
-	{
-		o->x /= w;
-		o->y /= w;
-		o->z /= w;
 	}
 }
 
@@ -113,11 +84,13 @@ int ft_gety(t_list *list)
 int ft_getx(t_list *list)
 {
 	int count;
-	
+
 	count = 0;
 	if (!list) return (0);
 	while (list->line[count])
 		count++;
+	if (list->line[count-1][0] == '\n')
+		count--;
 	return (count);
 }
 
@@ -141,7 +114,6 @@ t_vec3d **ft_map(t_list *list)
 	int i = 0;
 	int j = 0;
 	map = (t_vec3d **)malloc(sizeof(t_vec3d *) * x * y);
-	printf("x, y, %i, %i \n", x, y);
 	while (i < y)
 	{
 		j = 0;
@@ -159,91 +131,72 @@ t_vec3d **ft_map(t_list *list)
 	return map;
 }
 
-t_data	*initdata()
+void ft_drawline(t_img data, int x0, int y0, int x1, int y1)
 {
-	t_data *data;
-
-	data = (t_data *)malloc(sizeof(t_data));
-	data->fWidth = 1920.0;
-	data->fHeight = 1080.0;
-	data->fNear = 0.1;
-	data->fFar = 1000.0;
-	data->fFov = 90.0;
-	data->fAspectRatio = data->fHeight / data->fWidth;
-	data->fFovRad = 1.0 / tan(data->fFov * 0.5 / 180.0 * 3.14159);
-	return (data);
+	int dx, dy, p, x, y;
+	dx=x1-x0;
+	dy=y1-y0;
+	x=x0;
+	y=y0;
+	p=2*dy-dx;
+	while(x<x1)
+	{
+		if(p>=0)
+		{
+			ft_putpixel(&data,x,y,0x00FF0000);
+			y=y+1;
+			p=p+2*dy-2*dx;
+		}
+		else
+		{
+			ft_putpixel(&data,x,y,0x00FF0000);
+			p=p+2*dy;}
+		x=x+1;
+	}
 }
 
-t_mat4x4	*ft_initmat()
-{
-	t_mat4x4 *matProj;
-	t_data *data = initdata();
-
-	matProj = (t_mat4x4 *)malloc(sizeof(t_mat4x4));
-	matProj->m[0][0] = data->fAspectRatio * data->fFovRad;
-	matProj->m[1][1] = data->fFovRad;
-	matProj->m[2][2] = data->fFar / (data->fFar - data->fNear);
-	matProj->m[3][2] = (-data->fFar * data->fNear) / (data->fFar - data->fNear);
-	matProj->m[2][3] = 1.0;
-	matProj->m[3][3] = 0.0;
-	return (matProj);
+int toIsometric2D(int x, int y, int z, int *u, int *v){
+	*u = (x-z)/sqrt(2);
+	*v = (x+2*y+z)/sqrt(6);
+	return 0;
 }
-
-void ft_drawline(t_img data, int x0, int y0, int x1, int y1)  
-{  
-    int dx, dy, p, x, y;  
-    dx=x1-x0;  
-    dy=y1-y0;  
-    x=x0;  
-    y=y0;  
-    p=2*dy-dx;  
-    while(x<x1)  
-    {  
-        if(p>=0)  
-        {  
-            ft_putpixel(&data,x,y,0x00FF0000);  
-            y=y+1;  
-            p=p+2*dy-2*dx;  
-        }  
-        else  
-        {  
-            ft_putpixel(&data,x,y,0x00FF0000);  
-            p=p+2*dy;}  
-            x=x+1;  
-        }  
-} 
 
 int	main(void)
 {
 	void	*mlx;
 	void	*mlx_win;
-	t_img	img;
 
+	t_img	img;
+    t_list *list;
 	mlx = mlx_init();
-	mlx_win = mlx_new_window(mlx, 1920, 1080, "test");
-	img.img = mlx_new_image(mlx, 1920, 1080);
+	mlx_win = mlx_new_window(mlx, win_width, win_height, "test");
+	img.img = mlx_new_image(mlx, win_width, win_height);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	t_list *list;
-	t_vec3d **map;
-	t_mat4x4 *mat;
 	list = ft_parsefdf("test_maps/20-60.fdf");
-	map = ft_map(list);
-	mat = ft_initmat();
-	t_vec3d *vec;
-	for (int i = 0; i < 400; i++)
+	t_vec3d **map = ft_map(list);
+	for (int i; i < 400; i++)
 	{
-		vec = (t_vec3d *)malloc(sizeof(t_vec3d));
-		printf("%f, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
-		ft_MultiplyMatrixVector(map[i], map[i], mat);
-		map[i]->x += 1.0;
-		map[i]->x *= 0.5 * 1920.0;
-		map[i]->y += 1.0;
-		map[i]->y *= 0.5 * 1080.0;
-		printf("%f, %f, %f, %i \n", map[i]->z, map[i]->x, map[i]->y, map[i]->colour);
-		ft_putpixel(&img, map[i]->x, map[i]->y, 0x00FF0000);
-		free(vec);
+		printf("x : %f y: %f z: %f\n", map[i]->x, map[i]->y, map[i]->z);
+		int u = 0;
+		int v = 0;
+		toIsometric2D(map[i]->x, map[i]->y, map[i]->z, &u, &v);
+		if (i < 399) {
+			int u2 = 0;
+			int v2 = 0;
+			toIsometric2D(map[i + 1]->x, map[i + 1]->y, map[i + 1]->z, &u2, &v2);
+			ft_drawline(img, 342, 678, 789, 123);
+			//ft_drawline(img, (u * 10) + win_width/2, (v * 10) + win_height/2, (u2 * 10) + win_width/2, (v2 * 10) + win_height/2);
+			printf("u : %i u2: %i v: %i v2: %i\n", (u * 10) + win_width/2, (v * 10) + win_height/2, (u2 * 10) + win_width/2, (v2 * 10) + win_height/2);
+		}
+		if (i < 380) {
+			int u3 = 0;
+			int v3 = 0;
+			toIsometric2D(map[i + 20]->x, map[i + 20]->y, map[i + 20]->z, &u3, &v3);
+			ft_drawline(img, (u * 5) + win_width/2, (v * 5) + win_height/2, (u3 * 5) + win_width/2, (v3 * 5) + win_height/2);
+		}
+		ft_putpixel(&img, (u * 5) + win_width/2, (v * 10) + win_height/2, 0x00FF0000);
+		printf("u : %i v: %i\n", u, v);
 	}
-	ft_drawline(img, 100, 100, 200, 200);
 	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
 	mlx_loop(mlx);
 	return (0);
